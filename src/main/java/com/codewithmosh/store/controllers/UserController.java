@@ -1,6 +1,8 @@
 package com.codewithmosh.store.controllers;
 
+import com.codewithmosh.store.dtos.UserDto;
 import com.codewithmosh.store.entities.User;
+import com.codewithmosh.store.mappers.UserMapper;
 import com.codewithmosh.store.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -9,8 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
-
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -18,20 +19,20 @@ import java.util.Optional;
 public class UserController {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @GetMapping
-    public Iterable<User> getUsers() {
-        return userRepository.findAll();
+    public List<UserDto> getUsers() {
+        return userRepository.findAll().stream().map(userMapper::toDto)
+                .toList();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getById(@PathVariable Long id){
+    public ResponseEntity<UserDto> getById(@PathVariable Long id){
         var user = userRepository.findById(id).orElse(null);
         if (user == null) {
             return ResponseEntity.notFound().build();
-            //return new ResponseEntity<>(HttpStatus.NOT_FOUND); // this will also work
         }
-        //return new ResponseEntity<>(user, HttpStatus.OK);   //this will also work
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(userMapper.toDto(user));
     }
 }
