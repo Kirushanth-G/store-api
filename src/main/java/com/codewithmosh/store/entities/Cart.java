@@ -60,4 +60,8 @@ public class Cart {
             cartItem.setCart(null); // Unlink the item from the cart
         }
     }
+
+    public void clear() {
+        items.clear();
+    }
 }
